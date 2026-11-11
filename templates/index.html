@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PayPal Conditional Autopay — AI Mandate Firewall</title>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              navy: '#080E26',
+              dark: '#0B132B',
+              paypal: '#0070BA',
+              paypalDark: '#003087',
+              emerald: '#10B981',
+              amber: '#F59E0B',
+              crimson: '#EF4444',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- TOP EXECUTIVE COMMAND BAR -->
+  <header class="bg-[#080E26] text-white border-b border-slate-800 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        <!-- Brand Title & Connection Status -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#003087] via-[#0070BA] to-sky-400 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white font-bold text-xl tracking-tighter">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                PayPal Orders v2 & Vault v3
+              </span>
+              <span id="header-connection-badge" class="inline-flex items-center gap-1.5 text-xs text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Connecting...</span>
+              </span>
+            </div>
+            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+              PayPal Conditional Autopay <span class="text-xs font-normal text-slate-400 hidden sm:inline">— AI Mandate Firewall</span>
+            </h1>
+          </div>
+        </div>
+
+        <!-- Live Metrics & Production Modals Trigger -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          
+          <!-- Active Mandates Metric -->
+          <div class="bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-1.5 flex items-center gap-2.5 shadow-inner">
+            <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Active Mandates</div>
+              <div id="metric-active-mandates" class="text-base sm:text-lg font-bold text-white font-mono tracking-tight">0</div>
+            </div>
+          </div>
+
+          <!-- Total Auto-Settled Metric -->
+          <div class="bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-1.5 flex items-center gap-2.5 shadow-inner">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Auto-Settled</div>
+              <div id="metric-auto-settled" class="text-base sm:text-lg font-bold text-emerald-400 font-mono tracking-tight">$0.00</div>
+            </div>
+          </div>
+
+          <!-- Protected by AI Firewall Metric -->
+          <div class="bg-slate-900/90 border border-rose-500/30 rounded-xl px-3.5 py-1.5 flex items-center gap-2.5 shadow-inner">
+            <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-semibold text-rose-400 tracking-wider">Protected by AI</div>
+              <div id="metric-saved-by-ai" class="text-base sm:text-lg font-bold text-rose-400 font-mono tracking-tight">$0.00</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-2">
+            <button onclick="openIngestModal()" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-[#0070BA] hover:bg-[#005a96] text-white transition-all shadow-sm">
+              <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+              <span>Process Bill / Webhook</span>
+            </button>
+            <button onclick="openSettingsModal()" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all border border-slate-700">
+              <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Settings</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- 4-NODE LIVE PIPELINE VISUALIZER -->
+  <section class="bg-gradient-to-r from-[#0B132B] via-[#0E1A3D] to-[#0B132B] border-b border-slate-800 py-3.5 px-4 sm:px-6 shadow-md text-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-2 mb-2.5">
+        <div class="flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4 text-sky-400"></i>
+          <span class="text-xs uppercase font-bold tracking-widest text-slate-300">Live Mandate Execution Pipeline</span>
+          <span id="pipeline-status-text" class="text-xs text-sky-400 font-mono bg-sky-950/70 px-2 py-0.5 rounded border border-sky-800">Pipeline Ready • Standing Guard</span>
+        </div>
+        <div id="vault-token-display" class="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+          <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>PayPal Vault: Initializing...</span>
+        </div>
+      </div>
+
+      <!-- 4 Horizontal Nodes -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+        <div id="pipe-node-1" class="transition-all duration-300 rounded-xl bg-slate-900/80 border border-slate-700/70 p-3 flex items-center gap-3">
+          <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">1</div>
+          <div class="min-w-0">
+            <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Webhook / Bill Ingested</div>
+            <div id="pipe-node-1-desc" class="text-xs text-slate-300 truncate font-mono">Listening for Events...</div>
+          </div>
+        </div>
+        <div id="pipe-node-2" class="transition-all duration-300 rounded-xl bg-slate-900/80 border border-slate-700/70 p-3 flex items-center gap-3">
+          <div class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0">2</div>
+          <div class="min-w-0">
+            <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">AI Mandate Firewall</div>
+            <div id="pipe-node-2-desc" class="text-xs text-slate-300 truncate font-mono">Condition Bounds Guard</div>
+          </div>
+        </div>
+        <div id="pipe-node-3" class="transition-all duration-300 rounded-xl bg-slate-900/80 border border-slate-700/70 p-3 flex items-center gap-3">
+          <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">3</div>
+          <div class="min-w-0">
+            <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">PayPal Vault Mandate</div>
+            <div id="pipe-node-3-desc" class="text-xs text-slate-300 truncate font-mono">Vault Token Authenticated</div>
+          </div>
+        </div>
+        <div id="pipe-node-4" class="transition-all duration-300 rounded-xl bg-slate-900/80 border border-slate-700/70 p-3 flex items-center gap-3">
+          <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">4</div>
+          <div class="min-w-0">
+            <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Orders v2 Capture / Block</div>
+            <div id="pipe-node-4-desc" class="text-xs text-slate-300 truncate font-mono">Instant Capture / Freeze</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN APPLICATION WORKSPACE -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+    <!-- TOP SECTION: NATURAL-LANGUAGE MANDATE CREATOR & ACTIVE MANDATES -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT COL: SMART RULE CREATOR (5 COLS) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-1.5 text-xs font-bold uppercase text-[#0070BA] tracking-wider">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                Plain-English Mandate Creator
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 mt-0.5">Activate Conditional Autopay</h3>
+            </div>
+            <span class="text-[10px] font-mono bg-sky-50 text-[#0070BA] px-2 py-1 rounded border border-sky-100 font-semibold">
+              AI NLP Powered
+            </span>
+          </div>
+
+          <!-- Plain English Input -->
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Mandate Rule in Plain English</label>
+              <textarea id="rule-nlp-input" rows="3" placeholder="e.g. 'Pay landlord@metroprop.com $500 for rent ONLY AFTER incoming paycheck of at least $1,000 arrives' or 'Auto-pay invoices from billing@speednet.com only if total is $50 or less'" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA] bg-slate-50 focus:bg-white transition-all"></textarea>
+            </div>
+
+            <!-- Recipient PayPal Email & Name (Optional Override) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Payee PayPal Email</label>
+                <input type="email" id="rule-email-input" placeholder="payee@example.com" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA] bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Payee Name (Optional)</label>
+                <input type="text" id="rule-name-input" placeholder="Merchant or Landlord" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA] bg-white">
+              </div>
+            </div>
+
+            <button onclick="parseRuleWithAI()" id="btn-parse-rule" class="w-full inline-flex items-center justify-center gap-2 text-xs font-semibold py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-sm">
+              <i data-lucide="cpu" class="w-4 h-4 text-sky-400"></i>
+              Analyze Mandate with AI
+            </button>
+          </div>
+
+          <!-- Parsed Entities Preview Card (Hidden until analyzed) -->
+          <div id="parsed-preview-card" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+              <span class="flex items-center gap-1.5 text-emerald-600">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> Structured Mandate Preview
+              </span>
+              <span id="preview-category-badge" class="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold bg-blue-100 text-[#0070BA]">BILL_CAP</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="bg-white p-2 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Trigger Source</span>
+                <span id="preview-trigger" class="font-semibold text-slate-800 truncate block">--</span>
+              </div>
+              <div class="bg-white p-2 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Payee Recipient</span>
+                <span id="preview-recipient" class="font-semibold text-slate-800 truncate block">--</span>
+              </div>
+              <div class="bg-white p-2 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Payout Amount</span>
+                <span id="preview-amount" class="font-bold text-emerald-600 block">--</span>
+              </div>
+              <div class="bg-white p-2 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Firewall Guard</span>
+                <span id="preview-condition" class="font-semibold text-slate-700 block">--</span>
+              </div>
+            </div>
+
+            <button onclick="activateMandateInDB()" class="w-full inline-flex items-center justify-center gap-2 text-xs font-semibold py-2.5 px-4 rounded-xl bg-[#0070BA] hover:bg-[#005a96] text-white transition-all shadow-md">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+              Activate PayPal Mandate & Arm Firewall
+            </button>
+          </div>
+
+          <!-- Production Quick Templates -->
+          <div class="pt-2 border-t border-slate-100">
+            <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Production Templates</div>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="applyTemplate('Pay landlord@metroprop.com $500 for rent ONLY AFTER incoming paycheck of at least $1,000 arrives', 'landlord@metroprop.com', 'Metro Properties')" class="text-[11px] text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-full transition-colors">
+                Paycheck Chain Reaction ($1,000 -> $500)
+              </button>
+              <button onclick="applyTemplate('Auto-pay invoices from billing@speednet.com only if total is $50 or less', 'billing@speednet.com', 'SpeedNet Wi-Fi')" class="text-[11px] text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-full transition-colors">
+                Wi-Fi Bill Cap ($50 Max)
+              </button>
+              <button onclick="applyTemplate('Send $100 to rahul@designcraft.io the exact moment Client Corp pays $300 or more', 'rahul@designcraft.io', 'Rahul Sharma (Designer)')" class="text-[11px] text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-full transition-colors">
+                Client Revenue Split ($300 -> $100)
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT COL: ACTIVE MANDATES & HUMAN-IN-THE-LOOP OVERRIDES (7 COLS) -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <div class="flex items-center gap-1.5 text-xs font-bold uppercase text-[#0070BA] tracking-wider">
+                <i data-lucide="shield" class="w-4 h-4"></i>
+                Active Smart Mandates
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 mt-0.5">Persisted SQLite Autopay Rules</h3>
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+              <button onclick="filterRules('ALL')" id="filter-all" class="px-2.5 py-1 rounded bg-white text-slate-900 shadow-xs">All</button>
+              <button onclick="filterRules('ACTIVE_WAITING')" id="filter-active" class="px-2.5 py-1 rounded text-slate-600 hover:text-slate-900">Active</button>
+              <button onclick="filterRules('BLOCKED_BY_AI')" id="filter-blocked" class="px-2.5 py-1 rounded text-slate-600 hover:text-slate-900 text-rose-600">Blocked</button>
+              <button onclick="filterRules('EXECUTED')" id="filter-executed" class="px-2.5 py-1 rounded text-slate-600 hover:text-slate-900">Executed</button>
+            </div>
+          </div>
+
+          <!-- Rules List Container -->
+          <div id="rules-container" class="space-y-4">
+            <!-- Dynamically populated -->
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM SECTION: PAYPAL API & AI SECURITY LEDGER -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-6 space-y-5">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <div class="flex items-center gap-1.5 text-xs font-bold uppercase text-[#0070BA] tracking-wider">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            Audit Trail & Execution Proof
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mt-0.5">PayPal API & AI Security Ledger</h3>
+          <p class="text-xs text-slate-500">Immutable ledger of every webhook ingestion, step-by-step firewall evaluation, and PayPal Orders v2 REST API trace.</p>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button onclick="loadState()" class="inline-flex items-center gap-1.5 text-xs font-semibold py-1.5 px-3 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Ledger
+          </button>
+        </div>
+      </div>
+
+      <!-- Audit Logs Container -->
+      <div id="audit-logs-container" class="space-y-3">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-900">PayPal Conditional Autopay</span>
+        <span>•</span>
+        <span>PayPal REST API v2/v3 + Payment Method Vaulting</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span>SQLite Persistent Storage</span>
+        <span>•</span>
+        <span>AI Mandate Firewall Engine</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL 1: PROCESS INCOMING BILL / WEBHOOK INGESTION -->
+  <div id="ingest-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 font-bold text-slate-900 text-base">
+          <i data-lucide="receipt" class="w-5 h-5 text-[#0070BA]"></i>
+          Process Incoming Bill / Ingest Webhook Event
+        </div>
+        <button onclick="closeIngestModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Ingest Tabs -->
+      <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+        <button onclick="switchIngestTab('form')" id="tab-ingest-form" class="px-3 py-1.5 rounded bg-white text-slate-900 shadow-xs">Submit Bill or Event</button>
+        <button onclick="switchIngestTab('endpoints')" id="tab-ingest-endpoints" class="px-3 py-1.5 rounded text-slate-600 hover:text-slate-900">Webhook Endpoint URLs</button>
+      </div>
+
+      <!-- Tab A: Form Ingestion -->
+      <form id="ingest-form" onsubmit="submitIncomingEvent(event)" class="space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Trigger Source / Vendor / Payer</label>
+            <input type="text" id="ingest-source" required placeholder="e.g. SpeedNet Wi-Fi, Employer Paycheck, Client Corp" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Bill / Deposit Amount ($ USD)</label>
+            <input type="number" step="0.01" id="ingest-amount" required placeholder="85.00" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Event Type</label>
+            <select id="ingest-type" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+              <option value="INVOICE_BILLING">Vendor Monthly Invoice (Bill Cap)</option>
+              <option value="PAYROLL_DEPOSIT">Payroll Inbound ACH Deposit (Chain Reaction)</option>
+              <option value="CLIENT_PAYMENT">Client Corp Milestone Payment (Split)</option>
+              <option value="OBJECT_VERIFIED">Cloud File SHA-256 Verified (Milestone)</option>
+              <option value="PRICE_DROP_ALERT">E-Commerce Price Tracker Alert (Sniper)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Invoice # / Reference ID (Optional)</label>
+            <input type="text" id="ingest-ref" placeholder="INV-2026-992" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Custom Notes / Metadata (Optional)</label>
+          <input type="text" id="ingest-notes" placeholder="e.g. Includes unannounced speed surcharge" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeIngestModal()" class="text-xs font-semibold px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100">Cancel</button>
+          <button type="submit" id="btn-submit-ingest" class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-[#0070BA] text-white hover:bg-[#005a96]">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> Process via AI Mandate Firewall
+          </button>
+        </div>
+      </form>
+
+      <!-- Tab B: Real Webhook Endpoints -->
+      <div id="ingest-endpoints" class="hidden space-y-3 text-xs">
+        <p class="text-slate-600">Connect real webhook events from PayPal Developer Portal, GitHub, Stripe, or Zapier directly to this live instance:</p>
+        
+        <div class="space-y-2">
+          <div class="bg-slate-900 text-sky-300 p-3 rounded-lg font-mono text-[11px] flex items-center justify-between">
+            <span class="truncate">POST /api/webhooks/paypal</span>
+            <button onclick="copyToClipboard('/api/webhooks/paypal')" class="text-xs text-sky-400 hover:text-white shrink-0 ml-2">Copy</button>
+          </div>
+          <p class="text-[11px] text-slate-500">Supports <code class="font-mono text-slate-700">PAYMENT.CAPTURE.COMPLETED</code> and <code class="font-mono text-slate-700">INVOICING.INVOICE.PAID</code>.</p>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <div class="bg-slate-900 text-emerald-300 p-3 rounded-lg font-mono text-[11px] flex items-center justify-between">
+            <span class="truncate">POST /api/webhooks/external</span>
+            <button onclick="copyToClipboard('/api/webhooks/external')" class="text-xs text-emerald-400 hover:text-white shrink-0 ml-2">Copy</button>
+          </div>
+          <p class="text-[11px] text-slate-500">General webhook endpoint accepting JSON payload with <code class="font-mono text-slate-700">trigger_source</code> and <code class="font-mono text-slate-700">amount</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PAYPAL & AI SETTINGS -->
+  <div id="settings-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 font-bold text-slate-900 text-base">
+          <i data-lucide="sliders" class="w-5 h-5 text-[#0070BA]"></i>
+          PayPal & AI Firewall Settings
+        </div>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">PayPal Environment</label>
+          <select id="setting-env" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+            <option value="sandbox">PayPal Sandbox (api-m.sandbox.paypal.com)</option>
+            <option value="live">PayPal Live (api-m.paypal.com)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">PayPal Client ID</label>
+          <input type="text" id="setting-client-id" placeholder="AXXX... (from developer.paypal.com)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">PayPal Client Secret</label>
+          <input type="password" id="setting-client-secret" placeholder="EXXX... (securely encrypted in SQLite)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Merchant Account Email</label>
+          <input type="email" id="setting-merchant-email" placeholder="merchant@business.example.com" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Google Gemini API Key (Optional)</label>
+          <input type="password" id="setting-gemini-key" placeholder="AIzaSy... (for live LLM rule extraction)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0070BA]">
+          <p class="text-[10px] text-slate-400 mt-1">If empty, deterministic local regex/NLP parser runs offline with zero external dependencies.</p>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+          <button type="button" onclick="provisionVaultToken()" class="text-xs font-semibold text-[#0070BA] hover:underline">
+            Generate Vault Setup Token
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="closeSettingsModal()" class="text-xs font-semibold px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100">Cancel</button>
+            <button type="submit" id="btn-save-settings" class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-[#0070BA] text-white hover:bg-[#005a96]">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Save & Test Handshake
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    let appState = {
+      account: {},
+      metrics: {},
+      rules: [],
+      audit_logs: [],
+      config: {}
+    };
+    let currentFilter = 'ALL';
+    let tempParsedRule = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      loadState();
+    });
+
+    async function loadState() {
+      try {
+        const res = await fetch('/api/state');
+        const data = await res.json();
+        if (data.success) {
+          appState = data;
+          renderHeaderStatus(data.account);
+          renderMetrics(data.metrics);
+          renderRules(data.rules);
+          renderAuditLedger(data.audit_logs);
+          lucide.createIcons();
+        }
+      } catch (err) {
+        console.error("Failed to load state", err);
+        showToast("Error connecting to server", "error");
+      }
+    }
+
+    function renderHeaderStatus(account) {
+      const badge = document.getElementById('header-connection-badge');
+      const vaultDisplay = document.getElementById('vault-token-display');
+      
+      if (account.connected_status === 'CONNECTED') {
+        badge.className = "inline-flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> PayPal ${account.environment.toUpperCase()} Live`;
+      } else if (account.connected_status === 'ERROR') {
+        badge.className = "inline-flex items-center gap-1.5 text-xs text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/30";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Auth Error (Check Keys)`;
+      } else {
+        badge.className = "inline-flex items-center gap-1.5 text-xs text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-700";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Offline Sandbox Ready`;
+      }
+
+      if (account.vault_setup_token) {
+        vaultDisplay.innerHTML = `<i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i><span>Vault: ${account.vault_setup_token}</span>`;
+      } else {
+        vaultDisplay.innerHTML = `<i data-lucide="key" class="w-3.5 h-3.5 text-slate-500"></i><span>Vault: Pending Setup</span>`;
+      }
+    }
+
+    function renderMetrics(metrics) {
+      if (!metrics) return;
+      document.getElementById('metric-active-mandates').innerText = metrics.active_mandates || 0;
+      document.getElementById('metric-auto-settled').innerText = `$${(metrics.total_auto_settled || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('metric-saved-by-ai').innerText = `$${(metrics.total_saved_by_ai || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function renderRules(rules) {
+      const container = document.getElementById('rules-container');
+      if (!rules || rules.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/50">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0070BA] flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="plus-circle" class="w-6 h-6"></i>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm">No Active Mandates</h4>
+            <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              Your database is clean and ready. Type a plain-English conditional autopay rule on the left to arm your AI Mandate Firewall.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      const filtered = rules.filter(r => {
+        if (currentFilter === 'ALL') return true;
+        return r.status === currentFilter;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No mandates with status: ${currentFilter}</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(rule => {
+        let statusBadge = '';
+        if (rule.status === 'ACTIVE_WAITING') {
+          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> ACTIVE_WAITING
+          </span>`;
+        } else if (rule.status === 'EXECUTED') {
+          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <i data-lucide="check" class="w-3 h-3"></i> EXECUTED
+          </span>`;
+        } else if (rule.status === 'BLOCKED_BY_AI') {
+          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-300 animate-pulse">
+            <i data-lucide="shield-alert" class="w-3 h-3"></i> BLOCKED BY AI
+          </span>`;
+        } else if (rule.status === 'OVERRIDDEN') {
+          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full border border-blue-200">
+            <i data-lucide="user-check" class="w-3 h-3"></i> OVERRIDDEN
+          </span>`;
+        } else if (rule.status === 'PAUSED') {
+          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-200 px-2.5 py-0.5 rounded-full">
+            <i data-lucide="pause" class="w-3 h-3"></i> PAUSED
+          </span>`;
+        } else {
+          statusBadge = `<span class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full">${rule.status}</span>`;
+        }
+
+        let blockedBanner = '';
+        if (rule.status === 'BLOCKED_BY_AI') {
+          const spikedAmt = rule.pending_invoice_amount ? `$${rule.pending_invoice_amount.toFixed(2)}` : 'Spiked';
+          blockedBanner = `
+            <div class="mt-3.5 bg-rose-50 border-2 border-rose-300 rounded-xl p-3.5 space-y-3">
+              <div class="flex items-start gap-2.5 text-rose-800">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600 shrink-0 mt-0.5"></i>
+                <div>
+                  <div class="text-xs font-bold uppercase tracking-wider text-rose-700">Firewall Freeze Active — Action Required</div>
+                  <div class="text-xs text-rose-800 mt-0.5 font-medium">
+                    Attempted invoice of ${spikedAmt} exceeds your authorized cap of $${rule.condition_threshold.toFixed(2)}.
+                  </div>
+                  <div class="text-[11px] text-rose-600 mt-1">Zero dollars have left your PayPal account. You can manually authorize this spiked bill or permanently dispute it.</div>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-rose-200">
+                <button onclick="approveOverride(${rule.id})" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  Approve & Pay via PayPal (${spikedAmt})
+                </button>
+                <button onclick="rejectBill(${rule.id})" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white shadow-xs transition-colors">
+                  <i data-lucide="ban" class="w-3.5 h-3.5"></i>
+                  Reject & Dispute
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="rounded-xl border ${rule.status === 'BLOCKED_BY_AI' ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200 bg-white'} p-4 shadow-xs hover:shadow-sm transition-all">
+            <div class="flex items-start justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded border text-[#0070BA] bg-blue-50 border-blue-200">
+                    ${rule.rule_category}
+                  </span>
+                  ${statusBadge}
+                  <span class="text-[10px] font-mono text-slate-400">ID: #${rule.id}</span>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm truncate">${escapeHtml(rule.title)}</h4>
+                <p class="text-xs text-slate-600 italic">"${escapeHtml(rule.natural_language_rule)}"</p>
+              </div>
+              
+              <div class="flex items-center gap-1">
+                <button onclick="toggleRulePause(${rule.id})" class="text-slate-400 hover:text-slate-700 p-1.5 rounded transition-colors" title="${rule.status === 'PAUSED' ? 'Resume Mandate' : 'Pause Mandate'}">
+                  <i data-lucide="${rule.status === 'PAUSED' ? 'play' : 'pause'}" class="w-4 h-4"></i>
+                </button>
+                <button onclick="deleteRule(${rule.id})" class="text-slate-400 hover:text-rose-500 p-1.5 rounded transition-colors" title="Delete Mandate">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Parameters Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100 font-mono">
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Trigger</span>
+                <span class="font-medium text-slate-800 truncate block">${escapeHtml(rule.trigger_source)}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Payee PayPal</span>
+                <span class="font-medium text-slate-800 truncate block" title="${escapeHtml(rule.recipient_paypal_email)}">${escapeHtml(rule.recipient_paypal_email)}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Payout Amount</span>
+                <span class="font-bold text-emerald-600 block">$${rule.payment_amount.toFixed(2)}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-sans font-semibold block">Guard Bound</span>
+                <span class="font-semibold text-slate-700 block">${rule.condition_operator} $${rule.condition_threshold.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <!-- Vault Mandate ID token -->
+            <div class="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+              <span class="flex items-center gap-1 font-mono">
+                <i data-lucide="shield" class="w-3 h-3 text-[#0070BA]"></i>
+                Vault Mandate: ${escapeHtml(rule.vault_token_id)}
+              </span>
+              <span>Updated ${new Date(rule.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+
+            ${blockedBanner}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAuditLedger(logs) {
+      const container = document.getElementById('audit-logs-container');
+      if (!logs || logs.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs font-mono">Security ledger clean. No transactions or webhooks evaluated yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = logs.map(log => {
+        let verdictBadge = '';
+        if (log.verdict === 'CAPTURED') {
+          verdictBadge = `<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">CAPTURED</span>`;
+        } else if (log.verdict === 'BLOCKED') {
+          verdictBadge = `<span class="text-[11px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded border border-rose-300">BLOCKED BY AI</span>`;
+        } else if (log.verdict === 'CHAIN_TRIGGERED') {
+          verdictBadge = `<span class="text-[11px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded border border-purple-300">CHAIN TRIGGERED</span>`;
+        } else if (log.verdict === 'HOLD_INSUFFICIENT_TRIGGER') {
+          verdictBadge = `<span class="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">HOLD</span>`;
+        } else if (log.verdict === 'USER_OVERRIDE') {
+          verdictBadge = `<span class="text-[11px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300">USER OVERRIDE</span>`;
+        } else if (log.verdict === 'DISPUTED') {
+          verdictBadge = `<span class="text-[11px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded border border-rose-300">DISPUTED</span>`;
+        } else {
+          verdictBadge = `<span class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">${log.verdict}</span>`;
+        }
+
+        let stepsHtml = '';
+        if (Array.isArray(log.ai_reasoning_steps)) {
+          stepsHtml = log.ai_reasoning_steps.map(step => {
+            let textColor = 'text-slate-700';
+            if (step.includes('[✓]')) textColor = 'text-emerald-700 font-medium';
+            if (step.includes('[✗]')) textColor = 'text-rose-700 font-bold';
+            if (step.includes('[!]')) textColor = 'text-amber-700 font-medium';
+            return `<div class="text-xs ${textColor} font-mono leading-relaxed">${escapeHtml(step)}</div>`;
+          }).join('');
+        }
+
+        const rawJsonFormatted = JSON.stringify(log.raw_webhook_json, null, 2);
+        const paypalTraceFormatted = JSON.stringify(log.paypal_api_trace, null, 2);
+
+        return `
+          <div class="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3 transition-all hover:bg-white hover:shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                ${verdictBadge}
+                <span class="font-bold text-slate-900 text-sm">${escapeHtml(log.event_title)}</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs text-slate-400 font-mono">
+                <span>Amount: <strong class="text-slate-800">$${(log.amount_impact || 0).toFixed(2)}</strong></span>
+                <span>${new Date(log.timestamp).toLocaleTimeString()}</span>
+              </div>
+            </div>
+
+            <!-- Step-by-Step Reasoning -->
+            <div class="bg-white p-3 rounded-lg border border-slate-200/80 space-y-1">
+              <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1">AI Mandate Firewall Evaluation Steps</div>
+              ${stepsHtml}
+            </div>
+
+            <!-- Collapsible Drawer for Webhook JSON & PayPal REST API Trace -->
+            <details class="group text-xs">
+              <summary class="cursor-pointer text-[#0070BA] hover:underline font-semibold flex items-center gap-1 select-none">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 group-open:rotate-90 transition-transform"></i>
+                <span>Inspect PayPal Orders v2 REST API Trace & Ingested Webhook Payload</span>
+              </summary>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-2 border-t border-slate-200">
+                <div>
+                  <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">Incoming Webhook Payload</div>
+                  <pre class="bg-slate-900 text-sky-300 p-2.5 rounded-lg text-[11px] font-mono overflow-x-auto max-h-48">${escapeHtml(rawJsonFormatted)}</pre>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">PayPal Orders v2 / Vault API Trace</div>
+                  <pre class="bg-slate-900 text-emerald-300 p-2.5 rounded-lg text-[11px] font-mono overflow-x-auto max-h-48">${escapeHtml(paypalTraceFormatted)}</pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function animatePipeline(step1Text, step2Text, step3Text, step4Text, isBlocked = false) {
+      document.getElementById('pipe-node-1-desc').innerText = step1Text;
+      document.getElementById('pipe-node-2-desc').innerText = step2Text;
+      document.getElementById('pipe-node-3-desc').innerText = step3Text;
+      document.getElementById('pipe-node-4-desc').innerText = step4Text;
+
+      const n1 = document.getElementById('pipe-node-1');
+      const n2 = document.getElementById('pipe-node-2');
+      const n3 = document.getElementById('pipe-node-3');
+      const n4 = document.getElementById('pipe-node-4');
+      const statusText = document.getElementById('pipeline-status-text');
+
+      statusText.innerText = "Evaluating Mandate Rules...";
+      statusText.className = "text-xs text-amber-400 font-mono bg-amber-950/70 px-2 py-0.5 rounded border border-amber-800 animate-pulse";
+
+      setTimeout(() => n1.classList.add('ring-2', 'ring-blue-400'), 50);
+      setTimeout(() => {
+        n1.classList.remove('ring-2', 'ring-blue-400');
+        n2.classList.add('ring-2', isBlocked ? 'ring-rose-500' : 'ring-purple-400');
+      }, 350);
+      setTimeout(() => {
+        n2.classList.remove('ring-2', 'ring-rose-500', 'ring-purple-400');
+        n3.classList.add('ring-2', 'ring-amber-400');
+      }, 700);
+      setTimeout(() => {
+        n3.classList.remove('ring-2', 'ring-amber-400');
+        n4.classList.add('ring-2', isBlocked ? 'ring-rose-500' : 'ring-emerald-400');
+        statusText.innerText = isBlocked ? "Firewall Freeze • Zero Dollars Moved" : "Settled via PayPal Orders v2";
+        statusText.className = isBlocked
+          ? "text-xs text-rose-400 font-mono bg-rose-950/70 px-2 py-0.5 rounded border border-rose-800"
+          : "text-xs text-emerald-400 font-mono bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-800";
+      }, 1050);
+      setTimeout(() => {
+        n4.classList.remove('ring-2', 'ring-rose-500', 'ring-emerald-400');
+      }, 2400);
+    }
+
+    function applyTemplate(ruleText, email, name) {
+      document.getElementById('rule-nlp-input').value = ruleText;
+      document.getElementById('rule-email-input').value = email;
+      document.getElementById('rule-name-input').value = name;
+      parseRuleWithAI();
+    }
+
+    async function parseRuleWithAI() {
+      const text = document.getElementById('rule-nlp-input').value.trim();
+      if (!text) {
+        showToast("Please enter a rule sentence first", "warning");
+        return;
+      }
+
+      const emailOverride = document.getElementById('rule-email-input').value.trim();
+      const nameOverride = document.getElementById('rule-name-input').value.trim();
+
+      const btn = document.getElementById('btn-parse-rule');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin text-sky-400"></i> Analyzing Mandate...`;
+
+      try {
+        const res = await fetch('/api/parse-rule', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        if (data.success) {
+          tempParsedRule = data.parsed;
+          if (emailOverride) tempParsedRule.recipient_paypal_email = emailOverride;
+          if (nameOverride) tempParsedRule.recipient_name = nameOverride;
+
+          document.getElementById('preview-category-badge').innerText = tempParsedRule.rule_category;
+          document.getElementById('preview-trigger').innerText = tempParsedRule.trigger_source;
+          document.getElementById('preview-recipient').innerText = `${tempParsedRule.recipient_name} (${tempParsedRule.recipient_paypal_email})`;
+          document.getElementById('preview-amount').innerText = `$${tempParsedRule.payment_amount.toFixed(2)}`;
+          document.getElementById('preview-condition').innerText = `${tempParsedRule.condition_operator} $${tempParsedRule.condition_threshold.toFixed(2)}`;
+          document.getElementById('parsed-preview-card').classList.remove('hidden');
+          showToast("AI successfully structured mandate parameters", "success");
+        }
+      } catch (err) {
+        showToast("Error parsing rule", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="cpu" class="w-4 h-4 text-sky-400"></i> Analyze Mandate with AI`;
+        lucide.createIcons();
+      }
+    }
+
+    async function activateMandateInDB() {
+      if (!tempParsedRule) return;
+      try {
+        const res = await fetch('/api/rules', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(tempParsedRule)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Mandate activated and armed in SQLite!", "success");
+          document.getElementById('rule-nlp-input').value = '';
+          document.getElementById('rule-email-input').value = '';
+          document.getElementById('rule-name-input').value = '';
+          document.getElementById('parsed-preview-card').classList.add('hidden');
+          tempParsedRule = null;
+          await loadState();
+        } else {
+          showToast(data.error || "Failed to create rule", "error");
+        }
+      } catch (err) {
+        showToast("Error saving rule", "error");
+      }
+    }
+
+    async function toggleRulePause(ruleId) {
+      try {
+        const res = await fetch(`/api/rules/${ruleId}/toggle`, { method: 'PATCH' });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Rule status updated to ${data.rule.status}`, "info");
+          await loadState();
+        }
+      } catch (err) {
+        showToast("Error updating rule", "error");
+      }
+    }
+
+    async function deleteRule(ruleId) {
+      if (!confirm("Are you sure you want to delete this mandate?")) return;
+      try {
+        const res = await fetch(`/api/rules/${ruleId}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Mandate removed from SQLite", "info");
+          await loadState();
+        }
+      } catch (err) {
+        showToast("Error deleting rule", "error");
+      }
+    }
+
+    async function approveOverride(ruleId) {
+      try {
+        const res = await fetch(`/api/rules/${ruleId}/override`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Override authorized! Bill captured via PayPal Orders v2.", "success");
+          animatePipeline("User Override Approved", "Bypassing Cap Guard", "Vault Authorized", "Executed Orders v2");
+          await loadState();
+        }
+      } catch (err) {
+        showToast("Error approving override", "error");
+      }
+    }
+
+    async function rejectBill(ruleId) {
+      try {
+        const res = await fetch(`/api/rules/${ruleId}/reject`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Bill rejected and merchant mandate disputed.", "success");
+          await loadState();
+        }
+      } catch (err) {
+        showToast("Error rejecting bill", "error");
+      }
+    }
+
+    async function submitIncomingEvent(e) {
+      e.preventDefault();
+      const source = document.getElementById('ingest-source').value.trim();
+      const amount = parseFloat(document.getElementById('ingest-amount').value);
+      const type = document.getElementById('ingest-type').value;
+      const ref = document.getElementById('ingest-ref').value.trim();
+      const notes = document.getElementById('ingest-notes').value.trim();
+
+      const btn = document.getElementById('btn-submit-ingest');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/webhooks/external', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            trigger_source: source,
+            amount: amount,
+            event_type: type,
+            reference_id: ref,
+            notes: notes
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeIngestModal();
+          await loadState();
+          
+          let isBlocked = false;
+          if (data.evaluation && data.evaluation.results) {
+            isBlocked = data.evaluation.results.some(r => r.verdict === 'BLOCKED');
+          }
+          animatePipeline(`Ingested: ${source}`, `Evaluating Amount $${amount.toFixed(2)}`, "Vault Check", isBlocked ? "Firewall Freeze" : "Orders v2 Capture", isBlocked);
+          showToast(`Event evaluated: ${isBlocked ? 'Blocked by AI Firewall' : 'Processed'}`, isBlocked ? 'error' : 'success');
+        } else {
+          showToast(data.error || "Event processing failed", "error");
+        }
+      } catch (err) {
+        showToast("Error sending event", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function saveSettings(e) {
+      e.preventDefault();
+      const env = document.getElementById('setting-env').value;
+      const clientId = document.getElementById('setting-client-id').value.trim();
+      const clientSecret = document.getElementById('setting-client-secret').value.trim();
+      const email = document.getElementById('setting-merchant-email').value.trim();
+      const geminiKey = document.getElementById('setting-gemini-key').value.trim();
+
+      const btn = document.getElementById('btn-save-settings');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin text-white"></i> Testing Handshake...`;
+
+      try {
+        const res = await fetch('/api/settings/paypal', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            environment: env,
+            client_id: clientId,
+            client_secret: clientSecret,
+            merchant_email: email,
+            gemini_api_key: geminiKey
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message || "Settings updated!", "success");
+          closeSettingsModal();
+          await loadState();
+        } else {
+          showToast(data.error || "OAuth2 connection failed", "error");
+        }
+      } catch (err) {
+        showToast("Settings request failed", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i> Save & Test Handshake`;
+        lucide.createIcons();
+      }
+    }
+
+    async function provisionVaultToken() {
+      try {
+        const res = await fetch('/api/paypal/vault-setup', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Vault Token generated: ${data.vault_setup_token}`, "success");
+          await loadState();
+        }
+      } catch (err) {
+        showToast("Failed to generate vault token", "error");
+      }
+    }
+
+    function filterRules(status) {
+      currentFilter = status;
+      ['all', 'active', 'blocked', 'executed'].forEach(s => {
+        const el = document.getElementById(`filter-${s}`);
+        if (el) {
+          let match = false;
+          if (s === 'all' && status === 'ALL') match = true;
+          if (s === 'active' && status === 'ACTIVE_WAITING') match = true;
+          if (s === 'blocked' && status === 'BLOCKED_BY_AI') match = true;
+          if (s === 'executed' && status === 'EXECUTED') match = true;
+          el.className = match ? 'px-2.5 py-1 rounded bg-white text-slate-900 shadow-xs font-bold' : 'px-2.5 py-1 rounded text-slate-600 hover:text-slate-900';
+        }
+      });
+      renderRules(appState.rules);
+      lucide.createIcons();
+    }
+
+    function openIngestModal() {
+      document.getElementById('ingest-modal').classList.remove('hidden');
+    }
+    function closeIngestModal() {
+      document.getElementById('ingest-modal').classList.add('hidden');
+    }
+    function switchIngestTab(tab) {
+      const form = document.getElementById('ingest-form');
+      const endpoints = document.getElementById('ingest-endpoints');
+      const tabForm = document.getElementById('tab-ingest-form');
+      const tabEndpoints = document.getElementById('tab-ingest-endpoints');
+
+      if (tab === 'form') {
+        form.classList.remove('hidden');
+        endpoints.classList.add('hidden');
+        tabForm.className = "px-3 py-1.5 rounded bg-white text-slate-900 shadow-xs";
+        tabEndpoints.className = "px-3 py-1.5 rounded text-slate-600 hover:text-slate-900";
+      } else {
+        form.classList.add('hidden');
+        endpoints.classList.remove('hidden');
+        tabEndpoints.className = "px-3 py-1.5 rounded bg-white text-slate-900 shadow-xs";
+        tabForm.className = "px-3 py-1.5 rounded text-slate-600 hover:text-slate-900";
+      }
+    }
+
+    function openSettingsModal() {
+      const acc = appState.account || {};
+      document.getElementById('setting-env').value = acc.environment || 'sandbox';
+      document.getElementById('setting-client-id').value = acc.client_id || '';
+      document.getElementById('setting-client-secret').value = acc.client_secret || '';
+      document.getElementById('setting-merchant-email').value = acc.merchant_email || '';
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(window.location.origin + text);
+      showToast("Webhook URL copied to clipboard!", "info");
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let border = 'border-blue-500 bg-white text-slate-800';
+      let icon = '<i data-lucide="info" class="w-4 h-4 text-blue-500"></i>';
+      if (type === 'success') {
+        border = 'border-emerald-500 bg-white text-slate-800';
+        icon = '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>';
+      } else if (type === 'error') {
+        border = 'border-rose-500 bg-white text-slate-800';
+        icon = '<i data-lucide="alert-octagon" class="w-4 h-4 text-rose-500"></i>';
+      } else if (type === 'warning') {
+        border = 'border-amber-500 bg-white text-slate-800';
+        icon = '<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>';
+      }
+
+      toast.className = `pointer-events-auto flex items-center gap-2.5 p-3.5 rounded-xl border-l-4 shadow-xl text-xs font-semibold ${border} transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `${icon} <div class="flex-1">${escapeHtml(message)}</div>`;
+
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

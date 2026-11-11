@@ -1,0 +1,39 @@
+====================================================================
+PayPal Conditional Autopay - AI Mandate Firewall (Version 2)
+====================================================================
+
+HOW TO RUN THIS WEB APPLICATION (IN 10 SECONDS):
+
+PREREQUISITE:
+- Python 3.10+ installed (from https://www.python.org/downloads/)
+  * Note: Check the box "Add Python to PATH" during installation.
+
+--------------------------------------------------------------------
+ON WINDOWS (EASIEST):
+--------------------------------------------------------------------
+1. Double-click the file named:
+   start.bat
+
+2. It will automatically check Python, install required packages
+   (Flask & Requests), and open your web browser to:
+   http://localhost:5000
+
+--------------------------------------------------------------------
+ON MAC OR LINUX:
+--------------------------------------------------------------------
+1. Open Terminal in this folder.
+2. Run:
+   chmod +x start.sh
+   ./start.sh
+3. Open your browser at:
+   http://localhost:5000
+
+--------------------------------------------------------------------
+MANUAL METHOD (ANY SYSTEM / TERMINAL):
+--------------------------------------------------------------------
+1. Open command prompt or terminal in this folder.
+2. Run:
+   pip install -r requirements.txt
+   python app.py
+3. Open browser at:
+   http://localhost:5000

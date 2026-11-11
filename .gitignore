@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Database (uncomment if you don't want to track local db)
+# *.db
+
+# Environment variables & secrets
+.env
+*.local
+
+# OS files
+.DS_Store
+Thumbs.db
