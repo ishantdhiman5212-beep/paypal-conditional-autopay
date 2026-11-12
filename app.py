@@ -58,11 +58,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/tutorial")
-def tutorial():
-    return render_template("tutorial_video.html")
-
-
 @app.route("/api/state", methods=["GET"])
 def get_state():
     """Returns real-time account status, metrics, active rules, and audit ledger."""
