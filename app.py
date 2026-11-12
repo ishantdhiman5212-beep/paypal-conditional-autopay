@@ -23,6 +23,25 @@ app = Flask(__name__)
 # Initialize clean production schema
 db.init_db()
 
+# Auto-connect if PayPal credentials are provided via environment variables (e.g. Render Dashboard or .env)
+env_client_id = os.environ.get("PAYPAL_CLIENT_ID", "").strip()
+env_client_secret = os.environ.get("PAYPAL_CLIENT_SECRET", "").strip()
+env_environment = os.environ.get("PAYPAL_ENVIRONMENT", "sandbox").strip().lower()
+env_merchant_email = os.environ.get("PAYPAL_MERCHANT_EMAIL", "").strip()
+
+if env_client_id and env_client_secret:
+    try:
+        handshake = paypal_client.test_connection(env_client_id, env_client_secret, env_environment)
+        if handshake.get("success"):
+            db.update_account_credentials(env_client_id, env_client_secret, env_environment, env_merchant_email, status="CONNECTED")
+            account = db.get_account()
+            if not account.get("vault_setup_token"):
+                vault_res = paypal_client.create_vault_setup_token(env_client_id, env_client_secret, env_environment)
+                if vault_res.get("success"):
+                    db.update_vault_tokens(vault_setup_token=vault_res["vault_setup_token"])
+    except Exception as e:
+        print(f"PayPal Auto-connect error: {e}")
+
 
 @app.route("/")
 def index():
